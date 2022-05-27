@@ -3,19 +3,19 @@ import os
 
 cfg_model = EasyDict()
 cfg_model.name_model = 'ResNet50'
-cfg_model.use_stochastic_depth = False
-cfg_model.prob_stochastic_depth = 0.0
-cfg_model.zero_bn_init = False
+cfg_model.use_stochastic_depth = True
+cfg_model.prob_stochastic_depth = 0.5
+cfg_model.zero_bn_init = True
 cfg_model.nb_classes = 12
 
 
 cfg_model.input_channels = 3
 
-version_shortcut = 1
-strides = [2, 1, 1]
+version_shortcut = 2
+strides = [1, 2, 1]
 
 
-cfg_model.version_first_conv_block = 1
+cfg_model.version_first_conv_block = 2
 # first version
 cfg_model.first_conv_block_kernel_size = 7
 cfg_model.first_conv_block_stride = 2
