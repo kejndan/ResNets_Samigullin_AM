@@ -84,10 +84,19 @@ class Trainer:
         return self.dataset_train, self.dataset_test
 
     def _get_dataloader(self):
+        if self.config_train.weight_sampling:
+            nb_imgs_each_classes = np.array(self.dataset_train.get_nb_elem_in_each_class())
+            weights = 1. / nb_imgs_each_classes
+            sampler = torch.utils.data.WeightedRandomSampler(weights, nb_imgs_each_classes.sum(), replacement=False)
+        else:
+            sampler = None
+
+
         self.dataloader_train = DataLoader(self.dataset_train,
                                      batch_size=self.config_dataloader.batch_size,
                                      shuffle=self.config_dataloader.shuffle,
-                                     drop_last=self.config_dataloader.drop_last, num_workers=self.config_dataloader.num_workers)
+                                     drop_last=self.config_dataloader.drop_last, num_workers=self.config_dataloader.num_workers,
+                                           sampler=sampler)
         self.dataloader_test = DataLoader(self.dataset_test, batch_size=self.config_dataloader.batch_size, num_workers=self.config_dataloader.num_workers)
 
         return self.dataloader_train, self.dataloader_test
