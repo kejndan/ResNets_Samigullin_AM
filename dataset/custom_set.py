@@ -60,8 +60,19 @@ class CustomSet(torch.utils.data.Dataset):
 
         return img, label
 
+    def get_item_with_path(self, item):
+        img, label = self.data[item]
+        path = self.data.imgs[item][0]
+        return img, label, path
+
     def __len__(self):
         return len(self.data.samples)
+
+    def get_nb_elem_in_each_class(self):
+        nb_imgs = [0] * len(self.data.classes)
+        for img in self.data.imgs:
+            nb_imgs[img[1]] += 1
+        return nb_imgs
 
 
 

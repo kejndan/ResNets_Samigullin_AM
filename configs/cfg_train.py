@@ -9,6 +9,8 @@ cfg_train.lr = 1e-3
 cfg_train.momentum = 0.45
 cfg_train.weight_decay = 5e-5
 
+cfg_train.weight_sampling = True
+
 cfg_train.use_mixup_training = True
 
 cfg_train.scheduler = True
