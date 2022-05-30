@@ -86,15 +86,19 @@ class Trainer:
     def _get_dataloader(self):
         if self.config_train.weight_sampling:
             nb_imgs_each_classes = np.array(self.dataset_train.get_nb_elem_in_each_class())
-            weights = 1. / nb_imgs_each_classes
-            sampler = torch.utils.data.WeightedRandomSampler(weights, nb_imgs_each_classes.sum(), replacement=False)
+            class_weights = nb_imgs_each_classes.sum() / nb_imgs_each_classes
+            lbls_sample = self.dataset_train.get_lbl_each_sample()
+            weights = [class_weights[lbls_sample[i]] for i in range(nb_imgs_each_classes.sum())]
+            sampler = torch.utils.data.WeightedRandomSampler(weights, int(nb_imgs_each_classes.sum()), replacement=False)
+            shuffle = False
         else:
             sampler = None
+            shuffle = self.config_dataloader.shuffle
 
 
         self.dataloader_train = DataLoader(self.dataset_train,
                                      batch_size=self.config_dataloader.batch_size,
-                                     shuffle=self.config_dataloader.shuffle,
+                                     shuffle=shuffle,
                                      drop_last=self.config_dataloader.drop_last, num_workers=self.config_dataloader.num_workers,
                                            sampler=sampler)
         self.dataloader_test = DataLoader(self.dataset_test, batch_size=self.config_dataloader.batch_size, num_workers=self.config_dataloader.num_workers)
@@ -205,6 +209,7 @@ class Trainer:
 
             if self.config_train.save_best_epoch and self.need_save:
                 self.save(f'best_epoch', epoch)
+                self.need_save = False
             if self.config_train.save_each_epoch:
                 self.save(f'last_epoch', epoch)
 
