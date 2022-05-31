@@ -217,6 +217,7 @@ class Trainer:
         self.optimizer.load_state_dict(checkpoint['optimizer'])
         self.start_epoch = checkpoint['epoch']
         self.max_bal_accuracy = checkpoint['best_accuracy']
+        print(f'Load from: {checkpoint["epoch"]}')
 
     def config2dict(self):
         config = {'lr': self.config_train.lr,
@@ -326,4 +327,8 @@ if __name__ == '__main__':
                       config_train=cfg_train,
                       config_dataloader=cfg_dataloader)
     # trainer.fit_on_batch()
-    trainer.fit()
+    # trainer.fit()
+    trainer.load()
+    trainer.model.eval()
+    trainer.eval(trainer.dataloader_test)
+
