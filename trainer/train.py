@@ -69,7 +69,7 @@ class Trainer:
             )
         if self.config_train.scheduler:
             self.lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, T_max=self.config_train.nrof_epochs, eta_min=1e-7)
-            self.warmup_scheduler = GradualWarmupScheduler(self.optimizer, multiplier=1, total_epoch=100,
+            self.warmup_scheduler = GradualWarmupScheduler(self.optimizer, multiplier=1, total_epoch=1,
                                                       after_scheduler=self.lr_scheduler)
 
         print(f'Model: {self.config_model.name_model}\nLoss function: {self.config_train.loss}\nOptimizer: {self.config_train.optimizer}')
