@@ -82,6 +82,7 @@ class Trainer:
     def _get_dataset(self):
         self.dataset_train = CustomSet(cfg_custom_set.path, 'train',mixup_train=self.config_train.use_mixup_training)
         self.dataset_test = CustomSet(cfg_custom_set.path, 'valid')
+        self.dataset_test2 = CustomSet(cfg_custom_set.path, 'test')
         return self.dataset_train, self.dataset_test
 
     def _get_dataloader(self):
@@ -90,6 +91,8 @@ class Trainer:
                                      shuffle=self.config_dataloader.shuffle,
                                      drop_last=self.config_dataloader.drop_last, num_workers=self.config_dataloader.num_workers)
         self.dataloader_test = DataLoader(self.dataset_test, batch_size=self.config_dataloader.batch_size, num_workers=self.config_dataloader.num_workers)
+        self.dataloader_test2 = DataLoader(self.dataset_test2, batch_size=self.config_dataloader.batch_size,
+                                          num_workers=self.config_dataloader.num_workers)
 
         return self.dataloader_train, self.dataloader_test
 
@@ -330,5 +333,5 @@ if __name__ == '__main__':
     # trainer.fit()
     trainer.load()
     trainer.model.eval()
-    trainer.eval(trainer.dataloader_test)
+    trainer.eval(trainer.dataloader_test2)
 
