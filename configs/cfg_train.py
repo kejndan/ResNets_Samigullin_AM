@@ -28,7 +28,7 @@ cfg_train.eval_on_test = True
 
 cfg_train.verbose = False
 cfg_train.tensorboard = True
-cfg_train.experiment_name = 'test_3'
+cfg_train.experiment_name = 'test_5'
 cfg_train.log_path = f'../logs/{cfg_train.experiment_name}'
 
 cfg_train.save_folder = f'../saves/{cfg_train.experiment_name}'
