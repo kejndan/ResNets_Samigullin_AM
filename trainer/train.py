@@ -3,9 +3,10 @@ import torch
 from warmup_scheduler import GradualWarmupScheduler
 from torch.utils.data import DataLoader
 import torch.nn as nn
+from torch.nn import functional as F
 from torch import optim
 import numpy as np
-import os
+import os, shutil
 from nets.resnet import ResNet
 from metrics.accuracy import accuracy, balanced_accuracy
 
@@ -258,6 +259,64 @@ class Trainer:
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
+
+    def eval_w_thr(self, type_data=None, thr=0.9):
+        self.model.eval()
+        total_balanced_accuracy = []
+        if type_data == 'train':
+            ds = self.dataset_train
+        else:
+            ds = self.dataset_test
+        if not os.path.exists(f'../imgs_error_{thr}/{type_data}'):
+            os.makedirs(f'../imgs_error_{thr}/{type_data}')
+        count_big_error = 0
+        with torch.no_grad():
+            for i in range(len(ds)):
+                if i % 100 == 0:
+                    print(f'Processed {i}/{len(ds)}; Imgs with big error {count_big_error}')
+                img, label, path = ds.get_item_with_path(i)
+                batch_data = img.unsqueeze(0).to(self.device)
+                predictions = self.model(batch_data)
+                logit = F.softmax(predictions)
+                pred_conf, pred_lbl = logit.max().item(), logit.argmax().item()
+                if pred_lbl != label and pred_conf > thr:
+                    count_big_error += 1
+                    if not os.path.exists(f'../imgs_error_{thr}/{type_data}/{label}'):
+                        os.makedirs(f'../imgs_error_{thr}/{type_data}/{label}')
+                    shutil.copy(path,
+                                os.path.join(f'../imgs_error_{thr}/{type_data}/{label}', f'{pred_lbl}_{path.split("/")[-1]}'))
+
+
+
+        return total_balanced_accuracy
+
+
+    def eval_save_confindces_error(self, type_data=None, thr=0.9):
+        self.model.eval()
+        total_balanced_accuracy = []
+        if type_data == 'train':
+            ds = self.dataset_train
+        else:
+            ds = self.dataset_test
+        if not os.path.exists(f'../imgs_error_{thr}/{type_data}'):
+            os.makedirs(f'../imgs_error_{thr}/{type_data}')
+        confidences_error = []
+        count_big_error = 0
+        with torch.no_grad():
+            for i in range(len(ds)):
+                if i % 100 == 0:
+                    print(f'Processed {i}/{len(ds)}; Imgs with big error {count_big_error}')
+                img, label, path = ds.get_item_with_path(i)
+                batch_data = img.unsqueeze(0).to(self.device)
+                predictions = self.model(batch_data)
+                logit = F.softmax(predictions)
+                pred_conf, pred_lbl = logit.max().item(), logit.argmax().item()
+                if pred_lbl != label:
+                    confidences_error.append([pred_conf, path])
+
+        import pickle
+        with open(f'confidences_error_w_path_{type_data}.pickle', 'wb') as f:
+            pickle.dump(confidences_error, f)
 
 
 
