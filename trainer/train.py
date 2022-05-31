@@ -86,7 +86,7 @@ class Trainer:
     def _get_dataloader(self):
         if self.config_train.weight_sampling:
             nb_imgs_each_classes = np.array(self.dataset_train.get_nb_elem_in_each_class())
-            class_weights = nb_imgs_each_classes.sum() / nb_imgs_each_classes
+            class_weights = 1 - nb_imgs_each_classes / nb_imgs_each_classes.sum()
             lbls_sample = self.dataset_train.get_lbl_each_sample()
             weights = [class_weights[lbls_sample[i]] for i in range(nb_imgs_each_classes.sum())]
             sampler = torch.utils.data.WeightedRandomSampler(weights, int(nb_imgs_each_classes.sum()), replacement=False)
@@ -230,6 +230,7 @@ class Trainer:
         self.optimizer.load_state_dict(checkpoint['optimizer'])
         self.start_epoch = checkpoint['epoch']
         self.max_bal_accuracy = checkpoint['best_accuracy']
+        print(f"Load from: {checkpoint['epoch']}")
 
     def config2dict(self):
         config = {'lr': self.config_train.lr,
@@ -281,4 +282,7 @@ if __name__ == '__main__':
                       config_train=cfg_train,
                       config_dataloader=cfg_dataloader)
     # trainer.fit_on_batch()
-    trainer.fit()
+    # trainer.fit()
+    trainer.load()
+    trainer.model.eval()
+    trainer.eval(trainer.dataloader_test)
