@@ -63,6 +63,20 @@ class CustomSet(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.data.samples)
 
+    def get_nb_elem_in_each_class(self):
+        nb_imgs = [0] * len(self.data.classes)
+        for img in self.data.samples:
+            nb_imgs[img[1]] += 1
+        return nb_imgs
+
+    def get_lbl_each_sample(self):
+        lbls_sample = []
+        for i in range(len(self.data.samples)):
+            _, lbl = self.data.samples[i]
+            lbls_sample.append(lbl)
+        return lbls_sample
+
+
 
 
 
